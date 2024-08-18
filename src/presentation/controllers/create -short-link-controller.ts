@@ -2,7 +2,7 @@ import { HttpResponse } from '@/presentation/protocols/http'
 import { Controller } from '@/presentation/controllers/controller'
 import { CreateShortLink } from '@/domain/usecases/create-short-link'
 import { requestHandle } from '@/utils/request-handle'
-import { badRequest, ok } from '@/presentation/http/http-helper'
+import { badRequest, ok, serverError } from '@/presentation/http/http-helper'
 import { Validator } from '@/presentation/protocols/validator'
 import { BuilderValidation as Builder } from '@/presentation/validations/builder'
 
@@ -20,7 +20,7 @@ export class CreateShortLinkController extends Controller {
     const [error, result] = await requestHandle(this.createShortLink.create({ url, slug }))
 
     if (error !== null) {
-      return badRequest(error)
+      return serverError(error)
     }
 
     return ok(result)

@@ -8,7 +8,7 @@ export class Required implements Validator {
   ) {}
 
   validate (): Error | undefined {
-    if (this.value === undefined || this.value === null || this.value.trim() !== '') {
+    if (this.value === undefined || this.value === null || this.value.trim() === '') {
       return new RequiredFieldError(this.field)
     }
   }
