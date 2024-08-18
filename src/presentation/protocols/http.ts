@@ -5,7 +5,7 @@ export enum HttpStatusCode {
   NOT_FOUND = 404
 }
 
-export interface HttpResponse<T = unknown> {
+export interface HttpResponse<T = any> {
   statusCode: HttpStatusCode,
   data: T
 }
