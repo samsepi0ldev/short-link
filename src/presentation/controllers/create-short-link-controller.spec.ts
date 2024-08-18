@@ -1,15 +1,57 @@
-import { describe, it } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { fakerPT_BR as faker } from '@faker-js/faker'
+import { mock, MockProxy } from 'vitest-mock-extended'
 
-export function add(...args: number[]): number {
-  return args.reduce((a, b) => a + b, 0)
+import { CreateShortLink } from '@/domain/usecases/create-short-link'
+import { CreateShortLinkController } from '@/presentation/controllers/create -short-link-controller'
+import { badRequest, serverError } from '@/presentation/http/http-helper'
+import { RequiredFieldError } from '@/presentation/errors/validation'
+
+type Request = {
+  url: string
+  slug: string
 }
 
-// in-source test suites
-if (import.meta.vitest) {
-  const { it, expect } = import.meta.vitest
-  it('add', () => {
-    expect(add()).toBe(0)
-    expect(add(1)).toBe(1)
-    expect(add(1, 2, 3)).toBe(6)
+const fakeRequest = {
+  url: faker.internet.url(),
+  slug: faker.word.sample()
+}
+
+describe('CreateShortLinkController', () => {
+  let request: Request
+  let createShortLinkStub: MockProxy<CreateShortLink>
+  let sut: CreateShortLinkController
+
+  beforeAll(() => {
+    request = fakeRequest
+    createShortLinkStub = mock()
   })
-}
+
+  beforeEach(() => {
+    createShortLinkStub.create.mockResolvedValue({
+      id: faker.string.uuid()
+    })
+    sut = new CreateShortLinkController(createShortLinkStub)
+  })
+
+  it('i should be return a bad request if params not specified', async () => {
+    const response = await sut.handle({})
+    expect(response).toEqual(badRequest(new RequiredFieldError('url')))
+  })
+
+  it('is should be return a server error if create fails', async () => {
+    const error = new Error('custom_server_error')
+    createShortLinkStub.create.mockRejectedValueOnce(error)
+
+    const response = await sut.handle(fakeRequest)
+
+    expect(response).toEqual(serverError(error))
+  })
+
+  it('i should be return id if data success created', async () => {
+    const response = await sut.handle(fakeRequest)
+    
+    expect(response.statusCode).toBe(200)
+    expect(response.data).toHaveProperty('id')
+  })
+})
