@@ -5,7 +5,7 @@ import { Link } from '@/domain/entities/link'
 export class DbCreateShortLink implements CreateShortLink {
   constructor (private readonly createShortLinkRepository: CreateShortLinkRepository) {}
   
-  async create({ slug, url }: CreateShortLink.Input): Promise<CreateShortLink.Output> {
+  async create ({ slug, url }: CreateShortLink.Input): Promise<CreateShortLink.Output> {
     const shortLink = await this.createShortLinkRepository.create({ slug, url })
     
     return new Link({
