@@ -12,6 +12,8 @@ services:
       - db:/bitnami/postgresql
 
   pgadmin:
+    depends_on:
+      db:
     image: dpage/pgadmin4:latest
     restart: unless-stopped
     ports:
