@@ -1,4 +1,4 @@
-import { GetOriginalLink } from '@/domain/usecases/get-original-link'
+import type { GetOriginalLink } from '@/domain/usecases/get-original-link'
 
 export abstract class GetOriginalLinkRepository {
   abstract findBySlug (input: GetOriginalLinkRepository.Input): Promise<GetOriginalLinkRepository.Output>
