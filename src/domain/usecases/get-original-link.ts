@@ -8,5 +8,7 @@ export namespace GetOriginalLink {
   export type Input = {
     slug: string
   }
-  export type Output = Link
+  export type Output = {
+    url: string
+  } | null
 }
