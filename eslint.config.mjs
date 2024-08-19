@@ -1,4 +1,4 @@
-import eslintConfigLove, { rules } from 'eslint-config-love'
+import eslintConfigLove from 'eslint-config-love'
 
 export default [
   {
