@@ -4,8 +4,9 @@ import { mock, MockProxy } from 'vitest-mock-extended'
 
 import { GetOriginalLink } from '@/domain/usecases/get-original-link'
 import { GetOriginalLinkController } from '@/presentation/controllers/get-original-link-controller'
-import { badRequest, ok, serverError } from '@/presentation/http/http-helper'
+import { badRequest, forbidden, ok, serverError } from '@/presentation/http/http-helper'
 import { RequiredFieldError } from '@/presentation/errors/validation'
+import { ForbiddenError } from '../errors/forbidden-error'
 
 type Request = {
   slug: string
@@ -43,7 +44,7 @@ describe('GetOriginalLinkController', () => {
     expect(response).toEqual(badRequest(new RequiredFieldError('slug')))
   })
 
-  it('is should be return a server error if create fails', async () => {
+  it('is should be return a server error if get fails', async () => {
     const error = new Error('custom_server_error')
     getOriginalLinkStub.get.mockRejectedValueOnce(error)
 
@@ -52,7 +53,15 @@ describe('GetOriginalLinkController', () => {
     expect(response).toEqual(serverError(error))
   })
 
-  it('i should be return id if data success created', async () => {
+  it('is should be return a forbidden error if link not found fails', async () => {
+    getOriginalLinkStub.get.mockRejectedValueOnce(new ForbiddenError())
+
+    const response = await sut.handle(fakeRequest)
+
+    expect(response).toEqual(forbidden())
+  })
+
+  it('i should be return data if success', async () => {
     const response = await sut.handle(fakeRequest)
     
     expect(response).toEqual(ok(fakeResponse))
