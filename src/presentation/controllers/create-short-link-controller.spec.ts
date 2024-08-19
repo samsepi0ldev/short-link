@@ -29,7 +29,11 @@ describe('CreateShortLinkController', () => {
 
   beforeEach(() => {
     createShortLinkStub.create.mockResolvedValue({
-      id: faker.string.uuid()
+      id: faker.string.uuid(),
+      created_at: faker.date.anytime(),
+      short_url: faker.internet.url(),
+      slug: faker.word.sample(),
+      url: faker.internet.url()
     })
     sut = new CreateShortLinkController(createShortLinkStub)
   })
@@ -53,5 +57,9 @@ describe('CreateShortLinkController', () => {
     
     expect(response.statusCode).toBe(200)
     expect(response.data).toHaveProperty('id')
+    expect(response.data).toHaveProperty('slug')
+    expect(response.data).toHaveProperty('url')
+    expect(response.data).toHaveProperty('short_url')
+    expect(response.data).toHaveProperty('created_at')
   })
 })

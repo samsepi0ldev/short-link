@@ -19,6 +19,7 @@ const fakeResponse = {
   id: faker.string.uuid(),
   slug: faker.word.sample(),
   url: faker.internet.url(),
+  short_url: faker.internet.url(),
   created_at: faker.date.anytime()
 }
 
