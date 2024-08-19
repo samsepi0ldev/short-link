@@ -4,7 +4,8 @@ import { GetOriginalLink } from '@/domain/usecases/get-original-link'
 import { requestHandle } from '@/utils/request-handle'
 import { Validator } from '@/presentation/protocols/validator'
 import { BuilderValidation as Builder } from '@/presentation/validations/builder'
-import { ok, serverError } from '@/presentation/http/http-helper'
+import { forbidden, ok, serverError } from '@/presentation/http/http-helper'
+import { ForbiddenError } from '../errors/forbidden-error'
 
 type Request = {
   slug: string
@@ -19,6 +20,9 @@ export class GetOriginalLinkController extends Controller {
     const [error, result] = await requestHandle(this.getOriginalLink.get({ slug }))
 
     if (error !== null) {
+      if (error instanceof ForbiddenError) {
+        return forbidden(error)
+      }
       return serverError(error)
     }
 
