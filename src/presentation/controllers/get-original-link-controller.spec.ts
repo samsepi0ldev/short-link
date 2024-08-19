@@ -2,46 +2,49 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 import { mock, MockProxy } from 'vitest-mock-extended'
 
-import { CreateShortLink } from '@/domain/usecases/create-short-link'
-import { CreateShortLinkController } from '@/presentation/controllers/create-short-link-controller'
-import { badRequest, serverError } from '@/presentation/http/http-helper'
+import { GetOriginalLink } from '@/domain/usecases/get-original-link'
+import { GetOriginalLinkController } from '@/presentation/controllers/get-original-link-controller'
+import { badRequest, ok, serverError } from '@/presentation/http/http-helper'
 import { RequiredFieldError } from '@/presentation/errors/validation'
 
 type Request = {
-  url: string
   slug: string
 }
 
 const fakeRequest = {
-  url: faker.internet.url(),
   slug: faker.word.sample()
 }
 
-describe('CreateShortLinkController', () => {
+const fakeResponse = {
+  id: faker.string.uuid(),
+  slug: faker.word.sample(),
+  url: faker.internet.url(),
+  created_at: faker.date.anytime()
+}
+
+describe('GetOriginalLinkController', () => {
   let request: Request
-  let createShortLinkStub: MockProxy<CreateShortLink>
-  let sut: CreateShortLinkController
+  let getOriginalLinkStub: MockProxy<GetOriginalLink>
+  let sut: GetOriginalLinkController
 
   beforeAll(() => {
     request = fakeRequest
-    createShortLinkStub = mock()
+    getOriginalLinkStub = mock()
   })
 
   beforeEach(() => {
-    createShortLinkStub.create.mockResolvedValue({
-      id: faker.string.uuid()
-    })
-    sut = new CreateShortLinkController(createShortLinkStub)
+    getOriginalLinkStub.get.mockResolvedValue(fakeResponse)
+    sut = new GetOriginalLinkController(getOriginalLinkStub)
   })
 
   it('i should be return a bad request if params not specified', async () => {
     const response = await sut.handle({})
-    expect(response).toEqual(badRequest(new RequiredFieldError('url')))
+    expect(response).toEqual(badRequest(new RequiredFieldError('slug')))
   })
 
   it('is should be return a server error if create fails', async () => {
     const error = new Error('custom_server_error')
-    createShortLinkStub.create.mockRejectedValueOnce(error)
+    getOriginalLinkStub.get.mockRejectedValueOnce(error)
 
     const response = await sut.handle(fakeRequest)
 
@@ -51,7 +54,6 @@ describe('CreateShortLinkController', () => {
   it('i should be return id if data success created', async () => {
     const response = await sut.handle(fakeRequest)
     
-    expect(response.statusCode).toBe(200)
-    expect(response.data).toHaveProperty('id')
+    expect(response).toEqual(ok(fakeResponse))
   })
 })
