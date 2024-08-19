@@ -21,7 +21,7 @@ export class GetOriginalLinkController extends Controller {
 
     if (error !== null) {
       if (error instanceof ForbiddenError) {
-        return forbidden(error)
+        return forbidden()
       }
       return serverError(error)
     }
