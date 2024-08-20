@@ -21,3 +21,11 @@ export const forbidden = (): HttpResponse => ({
   statusCode: HttpStatusCode.FORBIDDEN,
   data: new ForbiddenError()
 })
+
+export const redirect = (url: string): HttpResponse => ({
+  statusCode: HttpStatusCode.REDIRECTION,
+  headers: {
+    Location: url
+  },
+  data: null
+})
