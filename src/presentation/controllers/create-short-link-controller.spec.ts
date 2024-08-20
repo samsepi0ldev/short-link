@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakerPT_BR as faker } from '@faker-js/faker'
 import { mock, MockProxy } from 'vitest-mock-extended'
 
@@ -41,6 +41,24 @@ describe('CreateShortLinkController', () => {
   it('i should be return a bad request if params not specified', async () => {
     const response = await sut.handle({})
     expect(response).toEqual(badRequest(new RequiredFieldError('url')))
+  })
+
+  it('i should be return a exception erro if controller throws', async () => {
+    vi.spyOn(CreateShortLinkController.prototype, 'perform').mockRejectedValueOnce(new Error(''))
+    const response = await sut.handle(request)
+    expect(response).toEqual(serverError(new RequiredFieldError('url')))
+  })
+
+  it('i should be buildValidator return array of errors', async () => {
+    const buildSpy = vi.spyOn(CreateShortLinkController.prototype, 'buildValidator')
+    await sut.handle({})
+    expect(buildSpy).toReturnTimes(1)
+  })
+
+  it('i should be buildValidator return array empty', async () => {
+    const buildSpy = vi.spyOn(CreateShortLinkController.prototype, 'buildValidator')
+    await sut.handle(request)
+    expect(buildSpy).toHaveBeenCalledWith(request)
   })
 
   it('is should be return a server error if create fails', async () => {

@@ -4,7 +4,7 @@ import { mock, MockProxy } from 'vitest-mock-extended'
 
 import { GetOriginalLink } from '@/domain/usecases/get-original-link'
 import { GetOriginalLinkController } from '@/presentation/controllers/get-original-link-controller'
-import { badRequest, forbidden, ok, serverError } from '@/presentation/http/http-helper'
+import { badRequest, forbidden, ok, redirect, serverError } from '@/presentation/http/http-helper'
 import { RequiredFieldError } from '@/presentation/errors/validation'
 import { ForbiddenError } from '../errors/forbidden-error'
 
@@ -64,6 +64,6 @@ describe('GetOriginalLinkController', () => {
   it('i should be return data if success', async () => {
     const response = await sut.handle(fakeRequest)
     
-    expect(response).toEqual(ok(fakeResponse))
+    expect(response).toEqual(redirect(fakeResponse.url))
   })
 })
